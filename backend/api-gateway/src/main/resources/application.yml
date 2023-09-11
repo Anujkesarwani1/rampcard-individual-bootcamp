@@ -1,0 +1,34 @@
+server:
+  port: 9191
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: RAMPCARD-SERVICE
+          uri: lb://RAMPCARD-SERVICE
+          predicates:
+            - Path=/rampcard/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: RAMPCARD-SERVICE
+                fallbackuri: forward:/rampcardServiceFallBack
+
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 4000
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
